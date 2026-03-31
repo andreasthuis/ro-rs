@@ -1,5 +1,5 @@
 [package]
-name = "roblox-rs"
+name = "ro-rs"
 version = "0.1.0"
 edition = "2021"
 description = "A modern, asynchronous Rust wrapper for the Roblox web API — a port of ro.py"
