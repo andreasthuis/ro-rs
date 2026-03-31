@@ -27,15 +27,7 @@ Add to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-roblox = { path = "./roblox-rs" }  # local
-tokio = { version = "1", features = ["full"] }
-```
-
-Or when published to crates.io:
-
-```toml
-[dependencies]
-roblox = "0.1"
+ro-rs = "0.1"
 tokio = { version = "1", features = ["full"] }
 ```
 
