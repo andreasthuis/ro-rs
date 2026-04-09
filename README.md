@@ -27,7 +27,7 @@ Add to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-ro-rs = "0.1.1"
+ro-rs = "0.1.2"
 tokio = { version = "1", features = ["full"] }
 ```
 
