@@ -41,6 +41,15 @@ pub struct UniverseLiveStats {
     pub player_counts_by_device_type: std::collections::HashMap<String, u64>,
 }
 
+/// The voting status for a universe.
+#[derive(Debug, Clone, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UniverseVoteStatus {
+    pub can_vote: bool,
+    pub user_vote: Option<bool>, // true = upvote, false = downvote, None = no vote
+    pub reason_for_not_being_able_to_vote: Option<String>,
+}
+
 /// Represents a Roblox universe (game).
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -106,6 +115,57 @@ impl Universe {
         Ok(data["favoritesCount"].as_u64().unwrap_or(0))
     }
 
+    /// Sets or removes the favorite status for the authenticated user.
+    pub async fn set_favorite(&self, favorite: bool) -> Result<()> {
+        let client = self.client.as_ref().expect("client not set");
+        let url = client
+            .url_generator
+            .get_url("games", &format!("v1/games/{}/favorites", self.id));
+        
+        let body = serde_json::json!({ "isFavorited": favorite });
+        let resp = client.http.post(&url).json(&body).send().await?;
+        
+        if !resp.status().is_success() {
+            let status = resp.status();
+            let body = resp.text().await.unwrap_or_default();
+            return Err(crate::error::RobloxError::from_status(status, &body));
+        }
+        Ok(())
+    }
+
+    /// Fetches the vote status (can the user vote, how did they vote).
+    pub async fn get_vote_status(&self) -> Result<UniverseVoteStatus> {
+        let client = self.client.as_ref().expect("client not set");
+        let url = client
+            .url_generator
+            .get_url("games", &format!("v1/games/{}/votes", self.id));
+        let resp = client.http.get(&url).send().await?;
+        if !resp.status().is_success() {
+            let status = resp.status();
+            let body = resp.text().await.unwrap_or_default();
+            return Err(crate::error::RobloxError::from_status(status, &body));
+        }
+        Ok(resp.json().await?)
+    }
+
+    /// Sets the user's vote (true = upvote, false = downvote).
+    pub async fn set_vote(&self, vote: bool) -> Result<()> {
+        let client = self.client.as_ref().expect("client not set");
+        let url = client
+            .url_generator
+            .get_url("games", &format!("v1/games/{}/user-votes", self.id));
+        
+        let body = serde_json::json!({ "vote": vote });
+        let resp = client.http.patch(&url).json(&body).send().await?;
+        
+        if !resp.status().is_success() {
+            let status = resp.status();
+            let body = resp.text().await.unwrap_or_default();
+            return Err(crate::error::RobloxError::from_status(status, &body));
+        }
+        Ok(())
+    }
+
     /// Fetches badges awarded by this universe, returning a [`PageIterator`].
     pub fn get_badges(
         &self,
@@ -118,6 +178,20 @@ impl Universe {
             .url_generator
             .get_url("badges", &format!("v1/universes/{}/badges", self.id));
         PageIterator::new(client.http.clone(), url, page_size, sort_order, max_items)
+    }
+
+    /// Fetches recommended universes based on this universe.
+    pub fn get_recommendations(
+        &self,
+        page_size: u32,
+        max_items: Option<usize>,
+    ) -> PageIterator<Universe> {
+        let client = self.client.as_ref().expect("client not set");
+        let url = client
+            .url_generator
+            .get_url("games", &format!("v1/games/{}/recommendations", self.id));
+        // Recommendations usually use Ascending order by default in Roblox APIs
+        PageIterator::new(client.http.clone(), url, page_size, SortOrder::Ascending, max_items)
     }
 }
 

@@ -11,7 +11,7 @@ use crate::utilities::page::{PageIterator, SortOrder};
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct User {
-    pub id: u64,
+    pub id: i64,
     pub name: String,
     pub display_name: String,
     #[serde(default)]
@@ -34,7 +34,7 @@ impl User {
     }
 
     /// Gets the user's friend count.
-    pub async fn get_friend_count(&self) -> Result<u64> {
+    pub async fn get_friend_count(&self) -> Result<i64> {
         let client = self.client.as_ref().expect("client not set");
         let url = client
             .url_generator
@@ -42,11 +42,11 @@ impl User {
         let resp = client.http.get(&url).send().await?;
         check_status(&resp)?;
         let data: serde_json::Value = resp.json().await?;
-        Ok(data["count"].as_u64().unwrap_or(0))
+        Ok(data["count"].as_i64().unwrap_or(0))
     }
 
     /// Gets the user's follower count.
-    pub async fn get_follower_count(&self) -> Result<u64> {
+    pub async fn get_follower_count(&self) -> Result<i64> {
         let client = self.client.as_ref().expect("client not set");
         let url = client
             .url_generator
@@ -54,11 +54,11 @@ impl User {
         let resp = client.http.get(&url).send().await?;
         check_status(&resp)?;
         let data: serde_json::Value = resp.json().await?;
-        Ok(data["count"].as_u64().unwrap_or(0))
+        Ok(data["count"].as_i64().unwrap_or(0))
     }
 
     /// Gets the user's following count.
-    pub async fn get_following_count(&self) -> Result<u64> {
+    pub async fn get_following_count(&self) -> Result<i64> {
         let client = self.client.as_ref().expect("client not set");
         let url = client
             .url_generator
@@ -66,7 +66,7 @@ impl User {
         let resp = client.http.get(&url).send().await?;
         check_status(&resp)?;
         let data: serde_json::Value = resp.json().await?;
-        Ok(data["count"].as_u64().unwrap_or(0))
+        Ok(data["count"].as_i64().unwrap_or(0))
     }
 
     /// Returns a [`PageIterator`] over this user's followers.
@@ -126,7 +126,7 @@ pub struct BaseUserData {
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct FriendData {
-    pub id: u64,
+    pub id: i64,
     pub name: String,
     pub display_name: String,
     #[serde(default)]

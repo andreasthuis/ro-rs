@@ -8,12 +8,12 @@ use crate::users::User;
 /// Call [`BaseUser::expand`] to fetch the full [`User`] object.
 #[derive(Debug, Clone)]
 pub struct BaseUser {
-    pub id: u64,
+    pub id: i64,
     pub(crate) client: Arc<ClientInner>,
 }
 
 impl BaseUser {
-    pub fn new(client: Arc<ClientInner>, id: u64) -> Self {
+    pub fn new(client: Arc<ClientInner>, id: i64) -> Self {
         Self { id, client }
     }
 

@@ -111,7 +111,7 @@ impl ClientInner {
 
     // ─── Internal fetch helpers ───────────────────────────────────────────────
 
-    pub async fn get_user(&self, user_id: u64) -> Result<User> {
+    pub async fn get_user(&self, user_id: i64) -> Result<User> {
         let url = self
             .url_generator
             .get_url("users", &format!("v1/users/{}", user_id));
@@ -307,7 +307,7 @@ impl Client {
     ///
     /// # Errors
     /// Returns [`RobloxError::UserNotFound`] if the user does not exist.
-    pub async fn get_user(&self, user_id: u64) -> Result<User> {
+    pub async fn get_user(&self, user_id: i64) -> Result<User> {
         self.inner.get_user(user_id).await
     }
 
@@ -371,12 +371,12 @@ impl Client {
             .and_then(|a| a.first().cloned())
             .ok_or(RobloxError::UserNotFound)?;
 
-        let id = arr["id"].as_u64().ok_or(RobloxError::UserNotFound)?;
+        let id = arr["id"].as_i64().ok_or(RobloxError::UserNotFound)?;
         self.get_user(id).await
     }
 
     /// Returns a [`BaseUser`] without sending any requests.
-    pub fn get_base_user(&self, user_id: u64) -> BaseUser {
+    pub fn get_base_user(&self, user_id: i64) -> BaseUser {
         BaseUser::new(self.inner.clone(), user_id)
     }
 
