@@ -1,6 +1,6 @@
 # roblox-rs
 
-A modern, asynchronous Rust library for the Roblox web API — a faithful port of [ro.py](https://github.com/ro-py/ro.py).
+A modern, asynchronous Rust library for the Roblox web API, a faithful port of [ro.py](https://github.com/ro-py/ro.py).
 
 ## Features
 
